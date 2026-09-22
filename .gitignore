@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+be/node_modules/
+fe/node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+be/.env
+be/.env.*
+!be/.env.example
+fe/.env
+fe/.env.*
+!fe/.env.example
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+be/dist/
+fe/.next/
+fe/out/
+
+# Test and coverage outputs
+coverage/
+playwright-report/
+test-results/
+
+# Caches
+.turbo/
+.cache/
+.eslintcache
+.tsbuildinfo
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Local runtime data
+tmp/
+temp/
+.tmp/
