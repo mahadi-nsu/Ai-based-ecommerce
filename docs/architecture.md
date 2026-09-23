@@ -32,6 +32,8 @@ Potential future models:
 - Shared DB, shared schema for most tenants.
 - Dedicated DB for enterprise tenants with stronger isolation or compliance needs.
 
+Use Prisma as the backend ORM and migration tool for the first version.
+
 ## Tenant Resolution
 
 Tenant context can be resolved from:

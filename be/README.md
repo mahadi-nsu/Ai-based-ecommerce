@@ -8,7 +8,7 @@ Recommended stack:
 - Fastify adapter
 - TypeScript strict mode
 - PostgreSQL
-- Prisma or TypeORM
+- Prisma
 - Redis
 - BullMQ
 - OpenSearch or Meilisearch
@@ -55,6 +55,7 @@ Current setup:
 - Fastify `app.inject()` e2e tests
 - Global validation pipe
 - `/api/health` endpoint
+- Prisma configured for PostgreSQL
 
 Commands:
 
@@ -65,6 +66,16 @@ npm run lint
 npm run test
 npm run test:e2e
 npm run build
+npm run db:validate
+npm run db:generate
 ```
 
-Database/ORM, Docker services, Redis, queue, and first domain module are intentionally not added yet. They should be decided through the pre-feature grill and architecture discussion.
+Redis, queue, and first domain module are intentionally not added yet. They should be decided through the pre-feature grill and architecture discussion.
+
+Local database:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/ecommerce_ai?schema=public"
+```
+
+Keep the real value in `.env`; only `.env.example` is committed.
