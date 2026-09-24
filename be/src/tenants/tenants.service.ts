@@ -1,6 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { Prisma, TenantStatus } from "@prisma/client";
 
+import { ApiErrorCode } from "../common/api-response/api-error-code.js";
+import { ApiException } from "../common/api-response/api-exception.js";
 import { PrismaService } from "../database/prisma.service.js";
 import type { CreateTenantDto } from "./dto/create-tenant.dto.js";
 
@@ -20,7 +22,10 @@ export class TenantsService {
       });
     } catch (error) {
       if (isUniqueConstraintError(error)) {
-        throw new ConflictException("Tenant slug already exists");
+        throw new ApiException(HttpStatus.CONFLICT, {
+          code: ApiErrorCode.TenantSlugExists,
+          message: "Tenant slug already exists"
+        });
       }
 
       throw error;
@@ -43,7 +48,7 @@ export class TenantsService {
     });
 
     if (!tenant) {
-      throw new NotFoundException("Tenant not found");
+      throwTenantNotFound();
     }
 
     return tenant;
@@ -57,7 +62,7 @@ export class TenantsService {
     });
 
     if (!tenant) {
-      throw new NotFoundException("Tenant not found");
+      throwTenantNotFound();
     }
 
     return tenant;
@@ -75,7 +80,7 @@ export class TenantsService {
       });
     } catch (error) {
       if (isNotFoundError(error)) {
-        throw new NotFoundException("Tenant not found");
+        throwTenantNotFound();
       }
 
       throw error;
@@ -89,4 +94,11 @@ function isUniqueConstraintError(error: unknown) {
 
 function isNotFoundError(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025";
+}
+
+function throwTenantNotFound(): never {
+  throw new ApiException(HttpStatus.NOT_FOUND, {
+    code: ApiErrorCode.TenantNotFound,
+    message: "Tenant not found"
+  });
 }

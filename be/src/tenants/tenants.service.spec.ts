@@ -1,6 +1,7 @@
-import { ConflictException, NotFoundException } from "@nestjs/common";
 import { Prisma, TenantStatus } from "@prisma/client";
 
+import { ApiErrorCode } from "../common/api-response/api-error-code.js";
+import { ApiException } from "../common/api-response/api-exception.js";
 import { TenantsService } from "./tenants.service.js";
 
 const sampleTenant = {
@@ -48,7 +49,12 @@ describe("TenantsService", () => {
         name: "Gadget Zone",
         slug: "gadget-zone"
       })
-    ).rejects.toBeInstanceOf(ConflictException);
+    ).rejects.toMatchObject({
+      response: {
+        code: ApiErrorCode.TenantSlugExists,
+        message: "Tenant slug already exists"
+      }
+    });
   });
 
   it("finds a tenant by slug", async () => {
@@ -72,7 +78,13 @@ describe("TenantsService", () => {
     });
     const service = new TenantsService(prisma);
 
-    await expect(service.getTenantById(sampleTenant.id)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.getTenantById(sampleTenant.id)).rejects.toBeInstanceOf(ApiException);
+    await expect(service.getTenantById(sampleTenant.id)).rejects.toMatchObject({
+      response: {
+        code: ApiErrorCode.TenantNotFound,
+        message: "Tenant not found"
+      }
+    });
   });
 });
 
