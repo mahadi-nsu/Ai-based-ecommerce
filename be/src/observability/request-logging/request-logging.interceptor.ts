@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor } from "@nestjs/common";
 import { catchError, Observable, tap, throwError } from "rxjs";
 
 import { PinoLoggerService } from "../logger/pino-logger.service.js";
@@ -51,7 +51,8 @@ export class RequestLoggingInterceptor implements NestInterceptor {
     error?: unknown
   ) {
     const durationMs = Math.round((performance.now() - startedAt) * 100) / 100;
-    const statusCode = response.statusCode ?? (error ? 500 : 200);
+    const statusCode =
+      error instanceof HttpException ? error.getStatus() : (response.statusCode ?? (error ? 500 : 200));
 
     this.logger.write(error ? "error" : "info", message, {
       requestId: this.requestContextService.getRequestId(),

@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 
 import { HealthModule } from "./health/health.module.js";
 import { ObservabilityModule } from "./observability/observability.module.js";
+import { TenantsModule } from "./tenants/tenants.module.js";
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { ObservabilityModule } from "./observability/observability.module.js";
       envFilePath: [".env.local", ".env"]
     }),
     ObservabilityModule,
-    HealthModule
+    HealthModule,
+    TenantsModule
   ]
 })
 export class AppModule {}
