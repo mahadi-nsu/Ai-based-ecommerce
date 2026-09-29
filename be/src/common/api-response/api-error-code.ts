@@ -4,7 +4,9 @@ export const ApiErrorCode = {
   Forbidden: "FORBIDDEN",
   InternalServerError: "INTERNAL_SERVER_ERROR",
   NotFound: "NOT_FOUND",
+  TenantInactive: "TENANT_INACTIVE",
   TenantNotFound: "TENANT_NOT_FOUND",
+  TenantRequired: "TENANT_REQUIRED",
   TenantSlugExists: "TENANT_SLUG_EXISTS",
   Unauthorized: "UNAUTHORIZED",
   ValidationFailed: "VALIDATION_FAILED"

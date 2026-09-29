@@ -20,7 +20,11 @@ type HttpExceptionResponse = string | {
 };
 
 type HttpResponseLike = {
-  status: (statusCode: number) => {
+  code?: (statusCode: number) => {
+    send: (body: unknown) => void;
+  };
+  send?: (body: unknown) => void;
+  status?: (statusCode: number) => {
     send: (body: unknown) => void;
   };
 };
@@ -35,7 +39,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
     const error = this.toApiError(exception, statusCode);
 
-    response.status(statusCode).send({
+    sendResponse(response, statusCode, {
       success: false,
       error,
       meta: {
@@ -104,4 +108,18 @@ function readMessage(exceptionResponse: Exclude<HttpExceptionResponse, string>) 
   }
 
   return exceptionResponse.error ?? "Request failed";
+}
+
+function sendResponse(response: HttpResponseLike, statusCode: number, body: ApiErrorResponse) {
+  if (response.status) {
+    response.status(statusCode).send(body);
+    return;
+  }
+
+  if (response.code) {
+    response.code(statusCode).send(body);
+    return;
+  }
+
+  response.send?.(body);
 }

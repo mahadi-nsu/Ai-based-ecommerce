@@ -7,6 +7,8 @@ export type RequestContext = {
   traceParent?: string;
   traceId?: string;
   tenantId?: string;
+  tenantSlug?: string;
+  tenantStatus?: string;
   userId?: string;
   role?: string;
 };
@@ -25,6 +27,10 @@ export class RequestContextService {
 
   getRequestId(): string | undefined {
     return this.getStore()?.requestId;
+  }
+
+  getTenantId(): string | undefined {
+    return this.getStore()?.tenantId;
   }
 
   merge(context: Partial<RequestContext>) {
