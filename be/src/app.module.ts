@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
+import { CategoriesModule } from "./categories/categories.module.js";
 import { ApiResponseModule } from "./common/api-response/api-response.module.js";
 import { HealthModule } from "./health/health.module.js";
 import { ObservabilityModule } from "./observability/observability.module.js";
@@ -16,6 +17,7 @@ import { TenantsModule } from "./tenants/tenants.module.js";
     ObservabilityModule,
     ApiResponseModule,
     TenantContextModule,
+    CategoriesModule,
     HealthModule,
     TenantsModule
   ]

@@ -1,5 +1,7 @@
 export const ApiErrorCode = {
   BadRequest: "BAD_REQUEST",
+  CategoryCrudNotImplemented: "CATEGORY_CRUD_NOT_IMPLEMENTED",
+  CategorySlugExists: "CATEGORY_SLUG_EXISTS",
   Conflict: "CONFLICT",
   Forbidden: "FORBIDDEN",
   InternalServerError: "INTERNAL_SERVER_ERROR",
