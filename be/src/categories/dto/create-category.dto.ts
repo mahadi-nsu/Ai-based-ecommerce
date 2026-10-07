@@ -21,8 +21,8 @@ export class CreateCategoryDto {
 
   @IsOptional()
   @IsUrl({
-      require_protocol: true,
-    })
+    require_protocol: true
+  })
   imageUrl?: string;
 
   @IsOptional()

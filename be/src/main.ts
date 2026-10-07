@@ -1,5 +1,6 @@
 import "reflect-metadata";
 
+import multipart from "@fastify/multipart";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter } from "@nestjs/platform-fastify";
@@ -14,6 +15,13 @@ async function bootstrap() {
   });
 
   app.useLogger(app.get(PinoLoggerService));
+
+  await app.register(multipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024,
+      files: 1
+    }
+  });
 
   app.setGlobalPrefix(process.env.API_PREFIX ?? "api");
   app.useGlobalPipes(

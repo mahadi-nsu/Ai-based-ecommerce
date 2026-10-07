@@ -3,11 +3,11 @@ import { Prisma } from "@prisma/client";
 
 import { ApiErrorCode } from "../common/api-response/api-error-code.js";
 import { ApiException } from "../common/api-response/api-exception.js";
+import { PrismaService } from "../database/prisma.service.js";
 import { TenantContextService } from "../tenant-context/tenant-context.service.js";
+import { mapCategoryToResponse } from "./category.mapper.js";
 import type { CreateCategoryDto } from "./dto/create-category.dto.js";
 import type { UpdateCategoryDto } from "./dto/update-category.dto.js";
-import { PrismaService } from "@app/database/prisma.service.js";
-import { mapCategoryToResponse } from "./category.mapper.js";
 
 @Injectable()
 export class CategoriesService {
@@ -18,7 +18,7 @@ export class CategoriesService {
 
   async createCategory(dto: CreateCategoryDto) {
     const tenantId = this.tenantContext.getRequiredTenantId();
-  
+
     try {
       const category = await this.prisma.category.create({
         data: {
@@ -30,7 +30,7 @@ export class CategoriesService {
           imagePublicId: dto.imagePublicId
         }
       });
-  
+
       return mapCategoryToResponse(category);
     } catch (error) {
       if (isUniqueConstraintError(error)) {
@@ -39,7 +39,7 @@ export class CategoriesService {
           message: "Category slug already exists"
         });
       }
-  
+
       throw error;
     }
   }
@@ -76,8 +76,6 @@ function throwCategoryCrudNotImplemented(): never {
   });
 }
 
-
-// Helper functions
 function isUniqueConstraintError(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }

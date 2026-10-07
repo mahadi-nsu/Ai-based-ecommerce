@@ -28,6 +28,23 @@ type ApiErrorResponse = {
   };
 };
 
+type CreateCategoryResponse = {
+  success: true;
+  data: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    imageUrl: string | null;
+    imagePublicId: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  meta: {
+    requestId: string;
+  };
+};
+
 describe("CategoriesController (e2e)", () => {
   let app: NestFastifyApplication;
   let prisma: PrismaService;
@@ -88,8 +105,42 @@ describe("CategoriesController (e2e)", () => {
     });
   });
 
+  it("creates a category inside the current tenant", async () => {
+    const tenantSlug = await createActiveTenant();
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/categories",
+      headers: {
+        [TENANT_SLUG_HEADER]: tenantSlug
+      },
+      payload: {
+        name: "Electronics",
+        slug: "electronics",
+        description: "Devices and accessories",
+        imageUrl: "https://res.cloudinary.com/demo/image/upload/categories/electronics.png",
+        imagePublicId: "categories/electronics"
+      }
+    });
+
+    expect(response.statusCode).toBe(201);
+    const body = response.json<CreateCategoryResponse>();
+    expect(body).toMatchObject({
+      success: true,
+      data: {
+        name: "Electronics",
+        slug: "electronics",
+        description: "Devices and accessories",
+        imageUrl: "https://res.cloudinary.com/demo/image/upload/categories/electronics.png",
+        imagePublicId: "categories/electronics"
+      }
+    });
+    expect(body.data.id).toEqual(expect.any(String));
+    expect(body.data.createdAt).toEqual(expect.any(String));
+    expect(body.data.updatedAt).toEqual(expect.any(String));
+    expect(body.meta.requestId).toEqual(expect.any(String));
+  });
+
   it.each([
-    ["POST", "/api/categories", { name: "Electronics", slug: "electronics" }],
     ["GET", "/api/categories", undefined],
     ["GET", "/api/categories/6b74484b-bc91-4516-a479-04cdb5dc34f2", undefined],
     ["PATCH", "/api/categories/6b74484b-bc91-4516-a479-04cdb5dc34f2", { name: "Updated" }],
@@ -97,26 +148,26 @@ describe("CategoriesController (e2e)", () => {
   ] satisfies CategoryRouteCase[])(
     "%s %s is wired and returns the pending implementation error",
     async (method, url, payload) => {
-    const tenantSlug = await createActiveTenant();
-    const response = await app.inject({
-      method,
-      url,
-      headers: {
-        [TENANT_SLUG_HEADER]: tenantSlug
-      },
-      payload
-    });
+      const tenantSlug = await createActiveTenant();
+      const response = await app.inject({
+        method,
+        url,
+        headers: {
+          [TENANT_SLUG_HEADER]: tenantSlug
+        },
+        payload
+      });
 
-    expect(response.statusCode).toBe(501);
-    const body = response.json<ApiErrorResponse>();
-    expect(body).toMatchObject({
-      success: false,
-      error: {
-        code: "CATEGORY_CRUD_NOT_IMPLEMENTED",
-        message: "Category CRUD logic is not implemented yet"
-      }
-    });
-    expect(body.meta.requestId).toEqual(expect.any(String));
+      expect(response.statusCode).toBe(501);
+      const body = response.json<ApiErrorResponse>();
+      expect(body).toMatchObject({
+        success: false,
+        error: {
+          code: "CATEGORY_CRUD_NOT_IMPLEMENTED",
+          message: "Category CRUD logic is not implemented yet"
+        }
+      });
+      expect(body.meta.requestId).toEqual(expect.any(String));
     }
   );
 
@@ -201,6 +252,16 @@ async function cleanupCurrentTestTenants(prisma: PrismaService, slugs: string[])
   if (slugs.length === 0) {
     return;
   }
+
+  await prisma.category.deleteMany({
+    where: {
+      tenant: {
+        slug: {
+          in: slugs
+        }
+      }
+    }
+  });
 
   await prisma.tenant.deleteMany({
     where: {
